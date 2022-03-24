@@ -1,3 +1,4 @@
+#this code is from DeepFace and is only slightly adapted to my personal requirements
 import os
 from tqdm import tqdm
 import numpy as np
@@ -63,12 +64,6 @@ def custom_emotion_analyzer(db_path, model_name = 'VGG-Face', detector_backend =
 
 		emotion_model = DeepFace.build_model('Emotion')
 		print("Emotion model loaded")
-
-		age_model = DeepFace.build_model('Age')
-		print("Age model loaded")
-
-		gender_model = DeepFace.build_model('Gender')
-		print("Gender model loaded")
 
 		toc = time.time()
 
@@ -282,55 +277,6 @@ def custom_emotion_analyzer(db_path, model_name = 'VGG-Face', detector_backend =
 
 							face_224 = functions.preprocess_face(img = custom_face, target_size = (224, 224), grayscale = False, enforce_detection = False, detector_backend = 'opencv')
 
-							age_predictions = age_model.predict(face_224)[0,:]
-							apparent_age = Age.findApparentAge(age_predictions)
-
-							#-------------------------------
-
-							gender_prediction = gender_model.predict(face_224)[0,:]
-
-							if np.argmax(gender_prediction) == 0:
-								gender = "W"
-							elif np.argmax(gender_prediction) == 1:
-								gender = "M"
-
-							#print(str(int(apparent_age))," years old ", dominant_emotion, " ", gender)
-
-							analysis_report = str(int(apparent_age))+" "+gender
-
-							#-------------------------------
-
-							info_box_color = (46,200,255)
-
-							#top
-							if y - pivot_img_size + int(pivot_img_size/5) > 0:
-
-								triangle_coordinates = np.array( [
-									(x+int(w/2), y)
-									, (x+int(w/2)-int(w/10), y-int(pivot_img_size/3))
-									, (x+int(w/2)+int(w/10), y-int(pivot_img_size/3))
-								] )
-
-								cv2.drawContours(freeze_img, [triangle_coordinates], 0, info_box_color, -1)
-
-								cv2.rectangle(freeze_img, (x+int(w/5), y-pivot_img_size+int(pivot_img_size/5)), (x+w-int(w/5), y-int(pivot_img_size/3)), info_box_color, cv2.FILLED)
-
-								cv2.putText(freeze_img, analysis_report, (x+int(w/3.5), y - int(pivot_img_size/2.1)), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 111, 255), 2)
-
-							#bottom
-							elif y + h + pivot_img_size - int(pivot_img_size/5) < resolution_y:
-
-								triangle_coordinates = np.array( [
-									(x+int(w/2), y+h)
-									, (x+int(w/2)-int(w/10), y+h+int(pivot_img_size/3))
-									, (x+int(w/2)+int(w/10), y+h+int(pivot_img_size/3))
-								] )
-
-								cv2.drawContours(freeze_img, [triangle_coordinates], 0, info_box_color, -1)
-
-								cv2.rectangle(freeze_img, (x+int(w/5), y + h + int(pivot_img_size/3)), (x+w-int(w/5), y+h+pivot_img_size-int(pivot_img_size/5)), info_box_color, cv2.FILLED)
-
-								cv2.putText(freeze_img, analysis_report, (x+int(w/3.5), y + h + int(pivot_img_size/1.5)), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 111, 255), 2)
 
 						#-------------------------------
 						#face recognition
