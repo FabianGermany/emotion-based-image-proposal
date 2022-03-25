@@ -7,6 +7,7 @@ import cv2
 import time
 import re
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
+import collections #for ring buffer
 
 from deepface import DeepFace
 from deepface.extendedmodels import Age
@@ -16,6 +17,10 @@ from deepface.detectors import FaceDetector
 def custom_emotion_analyzer(db_path, model_name = 'VGG-Face', detector_backend = 'opencv', distance_metric = 'cosine', enable_face_analysis = True, source = 0, time_threshold = 5, frame_threshold = 5):
 
 	#------------------------
+
+	# ring buffer for emotion detection
+	emotion_ringbuffer = collections.deque(maxlen=5)
+	emotion_ringbuffer.extend(['emotion1', 'emotion2', 'emotion3', 'emotion4', 'emotion5'])  # to change, just use: emotion_ringbuffer.append('emotion6')
 
 	face_detector = FaceDetector.build_model(detector_backend)
 	print("Detector backend is ", detector_backend)
@@ -212,6 +217,39 @@ def custom_emotion_analyzer(db_path, model_name = 'VGG-Face', detector_backend =
 								mood_items.append(mood_item)
 
 							emotion_df = pd.DataFrame(mood_items, columns = ["emotion", "score"])
+							#parse single emotion values
+							relative_value_angry = emotion_df.score[0]
+							relative_value_disgust  = emotion_df.score[1]
+							relative_value_fear = emotion_df.score[2]
+							relative_value_happy = emotion_df.score[3]
+							relative_value_sad = emotion_df.score[4]
+							relative_value_surprise = emotion_df.score[5]
+							relative_value_neutral = emotion_df.score[6]
+
+							#here define what kind of emotion is regarded as unsuitable and should be regulated instead of maintained
+							if(
+								(relative_value_angry > 70) or # very agry
+								(relative_value_disgust > 80) or # very disgusted
+								(relative_value_fear > 70) or # very afraid
+								(relative_value_happy > 95) or  # extremely happy
+								(relative_value_sad > 80) or # very sad
+								(relative_value_surprise > 90) or # extremely surprised sad
+								(relative_value_angry + relative_value_disgust + relative_value_fear + relative_value_sad > 90) # mixture of several bad emotions
+							):
+								emotion_ringbuffer.append('bad_emotion')  # add the emotion to ringbuffer
+							else:
+								emotion_ringbuffer.append('good_emotion')
+							print(emotion_ringbuffer)
+							print("\n")
+							if (emotion_ringbuffer.__len__() > 0):
+								# check for similarity in buffer
+								bool_many_bad_emotions = all(elem == 'bad_emotion' for elem in emotion_ringbuffer)  # if all values are the same and 'bad_emotion'
+								if(bool_many_bad_emotions):
+									print("GAN Image will be created...")
+									#todo here activate GAN
+									emotion_ringbuffer.extend(['emotion1', 'emotion2', 'emotion3', 'emotion4', 'emotion5']) #then reset ringbuffer
+
+
 							emotion_df = emotion_df.sort_values(by = ["score"], ascending=False).reset_index(drop=True)
 
 							#background of mood box
