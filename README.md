@@ -28,12 +28,18 @@ which is based on seven emotions.
 
 
 ## How to use
-- Create a virtual environment (venv) in Python (e.g. via PyCharm).
-- Install  [deepface](https://github.com/serengil/deepface) via ```pip install deepface```
-- Download the dataset [Landscape Pictures](https://www.kaggle.com/datasets/arnaud58/landscape-pictures?resource=download) and
+1. Create a virtual environment (venv) in Python (e.g. via PyCharm) for this project.
+1. Install  [deepface](https://github.com/serengil/deepface), 
+   [PyTorch-GAN](https://github.com/eriklindernoren/PyTorch-GAN) 
+   and other dependencies
+   simply by typing
+```$ pip install -r requirements.txt```.
+1. Download the dataset [Landscape Pictures](https://www.kaggle.com/datasets/arnaud58/landscape-pictures?resource=download) and
   to the folder dataset
-- Make sure, the camera of the laptop is activated.
-- Run **`main.py`**
+1. Run ```XXXX todo``` to train the GAN on the dataset XXXXXXXXXX
+   (eigentlich mehrfach trainieren...).
+1. Make sure, the camera of the laptop is activated.
+1. Run **`main.py`** to start the emotion-based image proposal sytem.
 
 
 ## Outlook
