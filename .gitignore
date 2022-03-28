@@ -1,5 +1,4 @@
 venv
 .idea
-dataset/mnist/MNIST
 dataset/landscape_complete/landscape_class
 dataset/archive.zip

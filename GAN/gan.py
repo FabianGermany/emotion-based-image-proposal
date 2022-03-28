@@ -127,8 +127,8 @@ if cuda:
 # )
 
 #todo transforn resize usw.
-os.makedirs("../dataset/landscape_partial", exist_ok=True)
-dataset = dset.ImageFolder(root="../dataset/landscape_partial",
+os.makedirs("../dataset/landscape_complete", exist_ok=True)
+dataset = dset.ImageFolder(root="../dataset/landscape_complete",
                            transform=transforms.Compose([
                                transforms.Resize(opt.img_size),
                                transforms.CenterCrop(opt.img_size),
@@ -157,9 +157,6 @@ plt.axis("off")
 plt.title("Exemplary Training Images")
 plt.imshow(np.transpose(vutils.make_grid(real_batch[0].to(device)[:64], padding=2, normalize=True).cpu(),(1,2,0)))
 plt.show()
-
-
-#todo load data archive
 
 
 #Optimizers
