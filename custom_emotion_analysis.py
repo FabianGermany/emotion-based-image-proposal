@@ -243,6 +243,7 @@ def custom_emotion_analyzer(db_path, model_name = 'VGG-Face', detector_backend =
 								if(bool_many_bad_emotions):
 									print("GAN Image will be created...")
 									#todo here #activate GAN
+									#todo outsourcen andere Datei ggf.
 
 									# propose a soothing picture via GAN
 									emotion_ringbuffer.extend(['emotion1', 'emotion2', 'emotion3', 'emotion4', 'emotion5']) #then reset ringbuffer

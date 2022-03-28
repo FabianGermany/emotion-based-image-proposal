@@ -35,7 +35,7 @@ which is based on seven emotions.
    simply by typing
 ```$ pip install -r requirements.txt```.
 1. Download the dataset [Landscape Pictures](https://www.kaggle.com/datasets/arnaud58/landscape-pictures?resource=download)
-   unzip it and put the raw files into the folder **`dataset/landscape_complete/landscape_class`**
+   unzip it and put the raw files into the folder **`GAN/dataset/landscape_complete/landscape_class`**
 1. Run ```XXXX todo``` to train the GAN on the dataset XXXXXXXXXX
    (eigentlich mehrfach trainieren...).
 1. Make sure, the camera of the laptop is activated.
