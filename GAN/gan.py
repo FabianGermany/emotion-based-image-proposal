@@ -25,8 +25,8 @@ os.makedirs("../output", exist_ok=True)
 #Define (hyper-)parameters
 #--------------------------
 parser = argparse.ArgumentParser()
-parser.add_argument("--n_epochs", type=int, default=6, help="number of epochs of training") #default=200
-parser.add_argument("--batch_size", type=int, default=12, help="size of the batches") #default=64
+parser.add_argument("--n_epochs", type=int, default=20, help="number of epochs of training") #default=200
+parser.add_argument("--batch_size", type=int, default=32, help="size of the batches") #default=64
 parser.add_argument("--lr", type=float, default=0.0002, help="adam: learning rate")
 parser.add_argument("--b1", type=float, default=0.5, help="adam: decay of first order momentum of gradient")
 parser.add_argument("--b2", type=float, default=0.999, help="adam: decay of first order momentum of gradient")
@@ -34,7 +34,9 @@ parser.add_argument("--n_cpu", type=int, default=8, help="number of cpu threads 
 parser.add_argument("--latent_dim", type=int, default=100, help="dimensionality of the latent space")
 parser.add_argument("--img_size", type=int, default=64, help="size of each image dimension") #default=28; attention: if this is changed, then the architecture of the discriminator and generator must be changed! #todo
 parser.add_argument("--channels", type=int, default=3, help="number of image channels") #default=1; color images is 3
-parser.add_argument("--sample_interval", type=int, default=400, help="interval betwen image samples")
+parser.add_argument("--sample_interval", type=int, default=400, help="interval between image samples")
+parser.add_argument("--checkpoint_interval", type=int, default=100, help="interval between saving model checkpoints")
+
 opt = parser.parse_args()
 print(opt)
 img_shape = (opt.channels, opt.img_size, opt.img_size) #todo image size siehe display größe...
@@ -169,8 +171,8 @@ Tensor = torch.cuda.FloatTensor if cuda else torch.FloatTensor
 
 #Training
 #--------------------------
-for epoch in range(opt.n_epochs):
-    for i, (imgs, _) in enumerate(dataloader):
+for epoch in range(opt.n_epochs): #for each epoch
+    for i, (imgs, _) in enumerate(dataloader): #for each batch
 
         # Adversarial ground truths
         valid = Variable(Tensor(imgs.size(0), 1).fill_(1.0), requires_grad=False)
@@ -217,5 +219,12 @@ for epoch in range(opt.n_epochs):
         )
 
         batches_done = epoch * len(dataloader) + i
+
+        #save images regularly
         if batches_done % opt.sample_interval == 0:
             save_image(gen_imgs.data[:25], "../output/%d.png" % batches_done, nrow=5, normalize=True)
+
+        # save models regularly
+        # if batches_done % opt.checkpoint_interval == 0:
+        #     torch.save(optimizer_D.state_dict(), "models/Discriminator%d.pth" % batches_done)
+        #     torch.save(optimizer_G.state_dict(), "models/Generator%d.pth" % batches_done)
