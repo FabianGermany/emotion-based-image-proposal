@@ -8,7 +8,6 @@ import time
 import re
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 import collections #for ring buffer
-
 from deepface import DeepFace
 from deepface.extendedmodels import Age
 from deepface.commons import functions, realtime, distance as dst
@@ -28,7 +27,6 @@ def custom_emotion_analyzer(db_path, model_name = 'VGG-Face', detector_backend =
 	#------------------------
 
 	input_shape = (224, 224); input_shape_x = input_shape[0]; input_shape_y = input_shape[1]
-
 	text_color = (255,255,255)
 
 	employees = []
@@ -83,8 +81,6 @@ def custom_emotion_analyzer(db_path, model_name = 'VGG-Face', detector_backend =
 	#-----------------------
 
 	pbar = tqdm(range(0, len(employees)), desc='Finding embeddings')
-
-	#TODO: why don't you store those embeddings in a pickle file similar to find function?
 
 	embeddings = []
 	#for employee in employees:
@@ -217,7 +213,7 @@ def custom_emotion_analyzer(db_path, model_name = 'VGG-Face', detector_backend =
 								mood_items.append(mood_item)
 
 							emotion_df = pd.DataFrame(mood_items, columns = ["emotion", "score"])
-							#parse single emotion values
+							#parse single emotion values to check for too low valence or too high or too low arousal
 							relative_value_angry = emotion_df.score[0]
 							relative_value_disgust  = emotion_df.score[1]
 							relative_value_fear = emotion_df.score[2]
@@ -246,7 +242,9 @@ def custom_emotion_analyzer(db_path, model_name = 'VGG-Face', detector_backend =
 								bool_many_bad_emotions = all(elem == 'bad_emotion' for elem in emotion_ringbuffer)  # if all values are the same and 'bad_emotion'
 								if(bool_many_bad_emotions):
 									print("GAN Image will be created...")
-									#todo here activate GAN
+									#todo here #activate GAN
+
+									# propose a soothing picture via GAN
 									emotion_ringbuffer.extend(['emotion1', 'emotion2', 'emotion3', 'emotion4', 'emotion5']) #then reset ringbuffer
 
 

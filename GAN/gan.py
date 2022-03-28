@@ -1,40 +1,50 @@
+#todo here is an example https://pytorch.org/tutorials/beginner/dcgan_faces_tutorial.html
+
+#Import packages
+#--------------------------
 import argparse
 import os
 import numpy as np
+import matplotlib.pyplot as plt
+from matplotlib.pyplot import plot, draw, show
 import math
 
 import torchvision.transforms as transforms
+import torchvision.utils as vutils
 from torchvision.utils import save_image
-
 from torch.utils.data import DataLoader
-from torchvision import datasets
+import torchvision.datasets as dset
 from torch.autograd import Variable
-
 import torch.nn as nn
 import torch.nn.functional as F
 import torch
 
-os.makedirs("images", exist_ok=True)
+os.makedirs("../output", exist_ok=True)
 
+
+#Define (hyper-)parameters
+#--------------------------
 parser = argparse.ArgumentParser()
-parser.add_argument("--n_epochs", type=int, default=200, help="number of epochs of training")
-parser.add_argument("--batch_size", type=int, default=64, help="size of the batches")
+parser.add_argument("--n_epochs", type=int, default=6, help="number of epochs of training") #default=200
+parser.add_argument("--batch_size", type=int, default=12, help="size of the batches") #default=64
 parser.add_argument("--lr", type=float, default=0.0002, help="adam: learning rate")
 parser.add_argument("--b1", type=float, default=0.5, help="adam: decay of first order momentum of gradient")
 parser.add_argument("--b2", type=float, default=0.999, help="adam: decay of first order momentum of gradient")
 parser.add_argument("--n_cpu", type=int, default=8, help="number of cpu threads to use during batch generation")
 parser.add_argument("--latent_dim", type=int, default=100, help="dimensionality of the latent space")
-parser.add_argument("--img_size", type=int, default=28, help="size of each image dimension")
-parser.add_argument("--channels", type=int, default=1, help="number of image channels")
+parser.add_argument("--img_size", type=int, default=64, help="size of each image dimension") #default=28; attention: if this is changed, then the architecture of the discriminator and generator must be changed! #todo
+parser.add_argument("--channels", type=int, default=3, help="number of image channels") #default=1; color images is 3
 parser.add_argument("--sample_interval", type=int, default=400, help="interval betwen image samples")
 opt = parser.parse_args()
 print(opt)
+img_shape = (opt.channels, opt.img_size, opt.img_size) #todo image size siehe display größe...
+print("Image Shape: " + str(img_shape))
 
-img_shape = (opt.channels, opt.img_size, opt.img_size)
-
+ngpu = 0 #amount of GPUs; 0=CPU
 cuda = True if torch.cuda.is_available() else False
 
-
+#Define generator model
+#--------------------------
 class Generator(nn.Module):
     def __init__(self):
         super(Generator, self).__init__()
@@ -61,6 +71,8 @@ class Generator(nn.Module):
         return img
 
 
+#Define discriminator model
+#--------------------------
 class Discriminator(nn.Module):
     def __init__(self):
         super(Discriminator, self).__init__()
@@ -81,10 +93,12 @@ class Discriminator(nn.Module):
         return validity
 
 
-# Loss function
+#Loss function
+#--------------------------
 adversarial_loss = torch.nn.BCELoss()
 
-# Initialize generator and discriminator
+#Initialize generator and discriminator
+#--------------------------
 generator = Generator()
 discriminator = Discriminator()
 
@@ -93,31 +107,71 @@ if cuda:
     discriminator.cuda()
     adversarial_loss.cuda()
 
-# Configure data loader
-os.makedirs("../../data/mnist", exist_ok=True)
+
+
+#Load dataset
+#--------------------------
+
+# os.makedirs("../dataset/mnist", exist_ok=True)
+# dataloader = torch.utils.data.DataLoader(
+#     datasets.MNIST(
+#         "../dataset/mnist",
+#         train=True,
+#         download=True,
+#         transform=transforms.Compose(
+#             [transforms.Resize(opt.img_size), transforms.ToTensor(), transforms.Normalize([0.5], [0.5])]
+#         ),
+#     ),
+#     batch_size=opt.batch_size,
+#     shuffle=True,
+# )
+
+#todo transforn resize usw.
+os.makedirs("../dataset/landscape_partial", exist_ok=True)
+dataset = dset.ImageFolder(root="../dataset/landscape_partial",
+                           transform=transforms.Compose([
+                               transforms.Resize(opt.img_size),
+                               transforms.CenterCrop(opt.img_size),
+                               transforms.ToTensor(),
+                               transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5)),
+                           ]))
+
+
+
+#Configure the data loader
+#--------------------------
 dataloader = torch.utils.data.DataLoader(
-    datasets.MNIST(
-        "../../data/mnist",
-        train=True,
-        download=True,
-        transform=transforms.Compose(
-            [transforms.Resize(opt.img_size), transforms.ToTensor(), transforms.Normalize([0.5], [0.5])]
-        ),
-    ),
+    dataset= dataset,
     batch_size=opt.batch_size,
     shuffle=True,
 )
 
-# Optimizers
+
+device = torch.device("cuda:0" if (torch.cuda.is_available() and ngpu > 0) else "cpu")
+
+#Plot some exemplary training images
+#--------------------------
+real_batch = next(iter(dataloader))
+plt.figure(figsize=(6,6))
+plt.axis("off")
+plt.title("Exemplary Training Images")
+plt.imshow(np.transpose(vutils.make_grid(real_batch[0].to(device)[:64], padding=2, normalize=True).cpu(),(1,2,0)))
+plt.show()
+
+
+#todo load data archive
+
+
+#Optimizers
+#--------------------------
 optimizer_G = torch.optim.Adam(generator.parameters(), lr=opt.lr, betas=(opt.b1, opt.b2))
 optimizer_D = torch.optim.Adam(discriminator.parameters(), lr=opt.lr, betas=(opt.b1, opt.b2))
 
 Tensor = torch.cuda.FloatTensor if cuda else torch.FloatTensor
 
-# ----------
-#  Training
-# ----------
 
+#Training
+#--------------------------
 for epoch in range(opt.n_epochs):
     for i, (imgs, _) in enumerate(dataloader):
 
@@ -148,7 +202,7 @@ for epoch in range(opt.n_epochs):
 
         # ---------------------
         #  Train Discriminator
-        # ---------------------
+        #--------------------------
 
         optimizer_D.zero_grad()
 
@@ -167,4 +221,4 @@ for epoch in range(opt.n_epochs):
 
         batches_done = epoch * len(dataloader) + i
         if batches_done % opt.sample_interval == 0:
-            save_image(gen_imgs.data[:25], "images/%d.png" % batches_done, nrow=5, normalize=True)
+            save_image(gen_imgs.data[:25], "../output/%d.png" % batches_done, nrow=5, normalize=True)
