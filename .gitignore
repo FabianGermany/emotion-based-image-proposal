@@ -2,3 +2,4 @@ venv
 .idea
 dataset/landscape_complete/landscape_class
 dataset/archive.zip
+GAN/models

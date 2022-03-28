@@ -35,10 +35,11 @@ parser.add_argument("--latent_dim", type=int, default=100, help="dimensionality 
 parser.add_argument("--img_size", type=int, default=64, help="size of each image dimension") #default=28; attention: if this is changed, then the architecture of the discriminator and generator must be changed! #todo
 parser.add_argument("--channels", type=int, default=3, help="number of image channels") #default=1; color images is 3
 parser.add_argument("--sample_interval", type=int, default=400, help="interval between image samples")
-parser.add_argument("--checkpoint_interval", type=int, default=100, help="interval between saving model checkpoints")
-
+parser.add_argument("--checkpoint_interval", type=int, default=200, help="interval between saving model checkpoints")
 opt = parser.parse_args()
 print(opt)
+
+load_existing_model = True #decide whether to use an existing model (True) or to create a new one (False)
 img_shape = (opt.channels, opt.img_size, opt.img_size) #todo image size siehe display größe...
 print("Image Shape: " + str(img_shape))
 
@@ -103,6 +104,7 @@ adversarial_loss = torch.nn.BCELoss()
 #--------------------------
 generator = Generator()
 discriminator = Discriminator()
+
 
 if cuda:
     generator.cuda()
@@ -169,6 +171,16 @@ optimizer_D = torch.optim.Adam(discriminator.parameters(), lr=opt.lr, betas=(opt
 Tensor = torch.cuda.FloatTensor if cuda else torch.FloatTensor
 
 
+if(load_existing_model):
+    generator.load_state_dict(torch.load("models/existing_generator.pth"))
+    generator.eval()
+    discriminator.load_state_dict(torch.load("models/existing_discriminator.pth"))
+    discriminator.eval()
+    optimizer_G.load_state_dict(torch.load("models/existing_G_optimizer.pth"))
+    optimizer_D.load_state_dict(torch.load("models/existing_D_optimizer.pth"))
+
+    #todo optimizer laden..
+
 #Training
 #--------------------------
 for epoch in range(opt.n_epochs): #for each epoch
@@ -225,6 +237,8 @@ for epoch in range(opt.n_epochs): #for each epoch
             save_image(gen_imgs.data[:25], "../output/%d.png" % batches_done, nrow=5, normalize=True)
 
         # save models regularly
-        # if batches_done % opt.checkpoint_interval == 0:
-        #     torch.save(optimizer_D.state_dict(), "models/Discriminator%d.pth" % batches_done)
-        #     torch.save(optimizer_G.state_dict(), "models/Generator%d.pth" % batches_done)
+        if batches_done % opt.checkpoint_interval == 0:
+            torch.save(discriminator.state_dict(), "models/existing_discriminator%d.pth" % batches_done)
+            torch.save(generator.state_dict(), "models/existing_generator%d.pth" % batches_done)
+            torch.save(optimizer_D.state_dict(), "models/existing_D_optimizer%d.pth" % batches_done)
+            torch.save(optimizer_G.state_dict(), "models/existing_G_optimizer%d.pth" % batches_done)
