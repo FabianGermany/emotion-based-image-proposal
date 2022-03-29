@@ -15,10 +15,11 @@ from deepface.detectors import FaceDetector
 
 def custom_emotion_analyzer(db_path, model_name = 'VGG-Face', detector_backend = 'opencv', distance_metric = 'cosine', enable_face_analysis = True, source = 0, time_threshold = 5, frame_threshold = 5):
 
+	status_done = False #reset to init state
 
 	# ring buffer for emotion detection
 	emotion_ringbuffer = collections.deque(maxlen=5)
-	emotion_ringbuffer.extend(['emotion1', 'emotion2', 'emotion3', 'emotion4', 'emotion5'])  # to change, just use: emotion_ringbuffer.append('emotion6')
+	emotion_ringbuffer.extend(['emotion1', 'emotion2', 'emotion3', 'emotion4', 'emotion5'])  # reset ringbuffer; to change, just use: emotion_ringbuffer.append('emotion6')
 
 	face_detector = FaceDetector.build_model(detector_backend)
 	print("Detector backend is ", detector_backend)
@@ -240,12 +241,10 @@ def custom_emotion_analyzer(db_path, model_name = 'VGG-Face', detector_backend =
 								# check for similarity in buffer
 								bool_many_bad_emotions = all(elem == 'bad_emotion' for elem in emotion_ringbuffer)  # if all values are the same and 'bad_emotion'
 								if(bool_many_bad_emotions):
-									print("GAN Image will be created...")
-									#todo here #activate GAN
-									#todo outsourcen andere Datei ggf.
+									print("Python Script will be started to display GAN Image...")
+									status_done = True #do return; but first display the results
 
-									# propose a soothing picture via GAN
-									emotion_ringbuffer.extend(['emotion1', 'emotion2', 'emotion3', 'emotion4', 'emotion5']) #then reset ringbuffer
+									#emotion_ringbuffer.extend(['emotion1', 'emotion2', 'emotion3', 'emotion4', 'emotion5']) #then reset ringbuffer
 
 
 							emotion_df = emotion_df.sort_values(by = ["score"], ascending=False).reset_index(drop=True)
@@ -313,6 +312,8 @@ def custom_emotion_analyzer(db_path, model_name = 'VGG-Face', detector_backend =
 
 							face_224 = functions.preprocess_face(img = custom_face, target_size = (224, 224), grayscale = False, enforce_detection = False, detector_backend = 'opencv')
 
+						if(status_done):
+							return "done" #finish function
 
 						#-------------------------------
 						#face recognition
