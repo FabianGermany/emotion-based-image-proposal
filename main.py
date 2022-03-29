@@ -1,4 +1,4 @@
-import custom_emotion_analysis
+import emotion_recognition.custom_emotion_analysis as custom_emotion_analysis
 import matplotlib.pyplot as plt
 import matplotlib.image as image
 import time
@@ -9,7 +9,6 @@ import sys
 #sys.path.insert(0, 'GAN')
 #from GAN import inference
 from GAN import inference
-
 os.makedirs("GAN/output_training", exist_ok=True)
 
 
@@ -38,7 +37,6 @@ def display_GAN_landscape_image():
     # plt.draw()
     # plt.show(block=False)
 
-
 # Emotion detection function
 #------------------------
 #The normal way is to use DeepFace.stream or DeepFace.realtime.analysis for emotion recognition
@@ -54,8 +52,6 @@ def emotion_recognizer():
                                frame_threshold = 10 #amount of frames to focus on face; must be larger than 1
                                )
 
-
-
 # Procedure
 # ------------------------
 print("Starting software for emotion-based image generation...")
@@ -64,7 +60,6 @@ display_default_image() #print default image
 while(True):
     status = emotion_recognizer() #run emotion recognition script
     if (status == "bad emotion"):
-        #propose a soothing picture via GAN
-        display_GAN_landscape_image() #show a GAN image
+        display_GAN_landscape_image() #propose a soothing picture via GAN
         #todo ich könnte hier noch good emotion über loop etc.; aber für die Studie reicht das erstmal aus..
 plt.show()

@@ -26,7 +26,6 @@ which is based on seven emotions.
 **todo add image**
 
 
-
 ## How to use
 1. Create a virtual environment (venv) in Python (e.g. via PyCharm) for this project.
 1. Install  [deepface](https://github.com/serengil/deepface), 
@@ -35,12 +34,20 @@ which is based on seven emotions.
    simply by typing
 ```$ pip install -r requirements.txt```.
 1. Download the dataset [Landscape Pictures](https://www.kaggle.com/datasets/arnaud58/landscape-pictures?resource=download)
-   unzip it and put the raw files into the folder **`GAN/dataset/landscape_complete/landscape_class`**
-1. Run ```XXXX todo``` to train the GAN on the dataset XXXXXXXXXX
-   (eigentlich mehrfach trainieren...).
-1. Make sure, the camera of the laptop is activated.
-1. Run **`main.py`** to start the emotion-based image proposal sytem.
-
+   unzip it and put the raw files into the folder ```GAN/dataset/landscape_complete/landscape_class```
+1. Training
+    1. Set ```load_existing_model = False``` for the first time. 
+       For further training, the value can be set to ```True``` 
+       to train an existing model.
+    1. Run **`train_GAN.py`** in the ```GAN```  folder to train the GAN on the dataset.
+1. Testing/Inference
+    1. Make sure that the camera of the laptop is activated.
+    1. Run **`main.py`** to start the emotion-based image proposal sytem. 
+        This will run a script for
+       the emotion recognition **`custom_emotion_analysis.py`**. If the emotion is
+       not suitable (as described above), the trained GAN-model will generate
+       an image in **`inference.py`** which will replace the default UI image.
+       
 
 ## Outlook
 
