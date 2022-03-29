@@ -70,10 +70,13 @@ is only one possible action. Other ideas could be
 
 More more scientific input, I recommend this paper:
 *Schulz, F. K.: Patterns of in-car interaction based on emotion recognition. In (Kloos, U.; Martinez, N.; Tullius, G. Hrsg.): Informatics Inside Frühling 2021 Tagungsband. Hochschule Reutlingen, Reutlingen, Germany, 2021.*
-## License/Attributions
+## Attributions
 For this project, I use some libraries, third-party software or material such as:
 * The Python framework [deepface](https://github.com/serengil/deepface) for the emotion recognition
 * [PyTorch-GAN](https://github.com/eriklindernoren/PyTorch-GAN) for the GAN
   (An alternative that I haven't used is [Keras-GAN](https://github.com/eriklindernoren/Keras-GAN))
 * The dataset [Landscape Pictures dataset](https://www.kaggle.com/datasets/arnaud58/landscape-pictures?resource=download) 
   from kaggle
+* I also used code snippets from this 
+  [PyTorch tutorial](https://pytorch.org/tutorials/beginner/dcgan_faces_tutorial.html) 
+  that I recommend to read.

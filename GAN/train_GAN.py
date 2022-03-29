@@ -1,5 +1,3 @@
-#todo here is an example https://pytorch.org/tutorials/beginner/dcgan_faces_tutorial.html
-
 #Import packages
 #--------------------------
 import argparse

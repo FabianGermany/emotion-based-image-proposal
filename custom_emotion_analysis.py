@@ -15,7 +15,6 @@ from deepface.detectors import FaceDetector
 
 def custom_emotion_analyzer(db_path, model_name = 'VGG-Face', detector_backend = 'opencv', distance_metric = 'cosine', enable_face_analysis = True, source = 0, time_threshold = 5, frame_threshold = 5):
 
-	#------------------------
 
 	# ring buffer for emotion detection
 	emotion_ringbuffer = collections.deque(maxlen=5)
