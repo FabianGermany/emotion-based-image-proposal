@@ -12,27 +12,16 @@ import torchvision.datasets as dset
 from torch.autograd import Variable
 import torch
 import model_architecture
-from model_architecture import opt
+from model_architecture import opt, img_shape
 
 os.makedirs("output_training", exist_ok=True)
 
 #todo remove packages not used
 
 
-#Define (hyper-)parameters
-#--------------------------
-parser = argparse.ArgumentParser()
-parser.add_argument("--latent_dim", type=int, default=100, help="dimensionality of the latent space")
-parser.add_argument("--img_size", type=int, default=64, help="size of each image dimension") #default=28; attention: if this is changed, then the architecture of the discriminator and generator must be changed! #todo
-parser.add_argument("--channels", type=int, default=3, help="number of image channels") #default=1; color images is 3
-opt = parser.parse_args()
-img_shape = (opt.channels, opt.img_size, opt.img_size) #todo image size siehe display größe...
-
-
 #Initialize generator
 #--------------------------
 generator = model_architecture.Generator()
-
 
 #Hardware settings for the model training/inference
 #--------------------------
@@ -44,39 +33,23 @@ device = torch.device("cuda:0" if (torch.cuda.is_available() and ngpu > 0) else 
 Tensor = torch.cuda.FloatTensor if cuda else torch.FloatTensor
 
 
-
-#Optimizers
-#--------------------------
-optimizer_G = torch.optim.Adam(generator.parameters(), lr=opt.lr, betas=(opt.b1, opt.b2))
-
-
-
 # load existing model
+#--------------------------
 generator.load_state_dict(torch.load("models/existing_generator.pth"))
 generator.eval()
-optimizer_G.load_state_dict(torch.load("models/existing_G_optimizer.pth"))
-
-img_list = []
 
 #Inference
 #--------------------------
+z = Variable(Tensor(np.random.normal(0, 1, (opt.batch_size, opt.latent_dim)))) # Sample noise as generator input
+gen_img = generator(z) # Generate image
 
-
-
-optimizer_G.zero_grad()
-
-# Sample noise as generator input
-z = Variable(Tensor(np.random.normal(0, 1, (imgs.shape[0], opt.latent_dim))))
-# Generate a batch of images
-gen_img = generator(z)
-
-
-optimizer_G.step()
-
-save_image(gen_img.data[:25], "output_inference/inference.png", nrow=5, normalize=True)
-
-#todo show image instead of save
+#display image
+#--------------------------
 plt.figure(figsize=(9,9))
 plt.axis("off")
-plt.imshow(np.transpose(img_list[-1],(1,2,0)))
+plt.imshow(np.transpose(vutils.make_grid(gen_img[0].to(device)[:64], padding=2, normalize=True).cpu(),(1,2,0)))
 plt.show()
+
+#save image
+#--------------------------
+save_image(gen_img.data[:1], "output_inference/inference.png", nrow=1, normalize=True)
