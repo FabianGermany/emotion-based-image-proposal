@@ -1,7 +1,6 @@
 #this code is from DeepFace and is only slightly adapted to my personal requirements
 import os
 from tqdm import tqdm
-import numpy as np
 import pandas as pd
 import cv2
 import time
@@ -9,13 +8,12 @@ import re
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 import collections #for ring buffer
 from deepface import DeepFace
-from deepface.extendedmodels import Age
 from deepface.commons import functions, realtime, distance as dst
 from deepface.detectors import FaceDetector
 
 def custom_emotion_analyzer(db_path, model_name = 'VGG-Face', detector_backend = 'opencv', distance_metric = 'cosine', enable_face_analysis = True, source = 0, time_threshold = 5, frame_threshold = 5):
 
-	status_done = False #reset to init state
+	status = "Init" #reset to init state
 
 	# ring buffer for emotion detection
 	emotion_ringbuffer = collections.deque(maxlen=5)
@@ -242,7 +240,7 @@ def custom_emotion_analyzer(db_path, model_name = 'VGG-Face', detector_backend =
 								bool_many_bad_emotions = all(elem == 'bad_emotion' for elem in emotion_ringbuffer)  # if all values are the same and 'bad_emotion'
 								if(bool_many_bad_emotions):
 									print("Python Script will be started to display GAN Image...")
-									status_done = True #do return; but first display the results
+									status = "bad emotion" #do return; but first display the results
 
 									#emotion_ringbuffer.extend(['emotion1', 'emotion2', 'emotion3', 'emotion4', 'emotion5']) #then reset ringbuffer
 
@@ -312,112 +310,10 @@ def custom_emotion_analyzer(db_path, model_name = 'VGG-Face', detector_backend =
 
 							face_224 = functions.preprocess_face(img = custom_face, target_size = (224, 224), grayscale = False, enforce_detection = False, detector_backend = 'opencv')
 
-						if(status_done):
-							return "done" #finish function
-
-						#-------------------------------
-						#face recognition
-
-						custom_face = functions.preprocess_face(img = custom_face, target_size = (input_shape_y, input_shape_x), enforce_detection = False, detector_backend = 'opencv')
-
-						#check preprocess_face function handled
-						if custom_face.shape[1:3] == input_shape:
-							if df.shape[0] > 0: #if there are images to verify, apply face recognition
-								img1_representation = model.predict(custom_face)[0,:]
-
-								#print(freezed_frame," - ",img1_representation[0:5])
-
-								def findDistance(row):
-									distance_metric = row['distance_metric']
-									img2_representation = row['embedding']
-
-									distance = 1000 #initialize very large value
-									if distance_metric == 'cosine':
-										distance = dst.findCosineDistance(img1_representation, img2_representation)
-									elif distance_metric == 'euclidean':
-										distance = dst.findEuclideanDistance(img1_representation, img2_representation)
-									elif distance_metric == 'euclidean_l2':
-										distance = dst.findEuclideanDistance(dst.l2_normalize(img1_representation), dst.l2_normalize(img2_representation))
-
-									return distance
-
-								df['distance'] = df.apply(findDistance, axis = 1)
-								df = df.sort_values(by = ["distance"])
-
-								candidate = df.iloc[0]
-								employee_name = candidate['employee']
-								best_distance = candidate['distance']
-
-								#print(candidate[['employee', 'distance']].values)
-
-								#if True:
-								if best_distance <= threshold:
-									#print(employee_name)
-									display_img = cv2.imread(employee_name)
-
-									display_img = cv2.resize(display_img, (pivot_img_size, pivot_img_size))
-
-									label = employee_name.split("/")[-1].replace(".jpg", "")
-									label = re.sub('[0-9]', '', label)
-
-									try:
-										if y - pivot_img_size > 0 and x + w + pivot_img_size < resolution_x:
-											#top right
-											freeze_img[y - pivot_img_size:y, x+w:x+w+pivot_img_size] = display_img
-
-											overlay = freeze_img.copy(); opacity = 0.4
-											cv2.rectangle(freeze_img,(x+w,y),(x+w+pivot_img_size, y+20),(46,200,255),cv2.FILLED)
-											cv2.addWeighted(overlay, opacity, freeze_img, 1 - opacity, 0, freeze_img)
-
-											cv2.putText(freeze_img, label, (x+w, y+10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, text_color, 1)
-
-											#connect face and text
-											cv2.line(freeze_img,(x+int(w/2), y), (x+3*int(w/4), y-int(pivot_img_size/2)),(67,67,67),1)
-											cv2.line(freeze_img, (x+3*int(w/4), y-int(pivot_img_size/2)), (x+w, y - int(pivot_img_size/2)), (67,67,67),1)
-
-										elif y + h + pivot_img_size < resolution_y and x - pivot_img_size > 0:
-											#bottom left
-											freeze_img[y+h:y+h+pivot_img_size, x-pivot_img_size:x] = display_img
-
-											overlay = freeze_img.copy(); opacity = 0.4
-											cv2.rectangle(freeze_img,(x-pivot_img_size,y+h-20),(x, y+h),(46,200,255),cv2.FILLED)
-											cv2.addWeighted(overlay, opacity, freeze_img, 1 - opacity, 0, freeze_img)
-
-											cv2.putText(freeze_img, label, (x - pivot_img_size, y+h-10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, text_color, 1)
-
-											#connect face and text
-											cv2.line(freeze_img,(x+int(w/2), y+h), (x+int(w/2)-int(w/4), y+h+int(pivot_img_size/2)),(67,67,67),1)
-											cv2.line(freeze_img, (x+int(w/2)-int(w/4), y+h+int(pivot_img_size/2)), (x, y+h+int(pivot_img_size/2)), (67,67,67),1)
-
-										elif y - pivot_img_size > 0 and x - pivot_img_size > 0:
-											#top left
-											freeze_img[y-pivot_img_size:y, x-pivot_img_size:x] = display_img
-
-											overlay = freeze_img.copy(); opacity = 0.4
-											cv2.rectangle(freeze_img,(x- pivot_img_size,y),(x, y+20),(46,200,255),cv2.FILLED)
-											cv2.addWeighted(overlay, opacity, freeze_img, 1 - opacity, 0, freeze_img)
-
-											cv2.putText(freeze_img, label, (x - pivot_img_size, y+10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, text_color, 1)
-
-											#connect face and text
-											cv2.line(freeze_img,(x+int(w/2), y), (x+int(w/2)-int(w/4), y-int(pivot_img_size/2)),(67,67,67),1)
-											cv2.line(freeze_img, (x+int(w/2)-int(w/4), y-int(pivot_img_size/2)), (x, y - int(pivot_img_size/2)), (67,67,67),1)
-
-										elif x+w+pivot_img_size < resolution_x and y + h + pivot_img_size < resolution_y:
-											#bottom righ
-											freeze_img[y+h:y+h+pivot_img_size, x+w:x+w+pivot_img_size] = display_img
-
-											overlay = freeze_img.copy(); opacity = 0.4
-											cv2.rectangle(freeze_img,(x+w,y+h-20),(x+w+pivot_img_size, y+h),(46,200,255),cv2.FILLED)
-											cv2.addWeighted(overlay, opacity, freeze_img, 1 - opacity, 0, freeze_img)
-
-											cv2.putText(freeze_img, label, (x+w, y+h-10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, text_color, 1)
-
-											#connect face and text
-											cv2.line(freeze_img,(x+int(w/2), y+h), (x+int(w/2)+int(w/4), y+h+int(pivot_img_size/2)),(67,67,67),1)
-											cv2.line(freeze_img, (x+int(w/2)+int(w/4), y+h+int(pivot_img_size/2)), (x+w, y+h+int(pivot_img_size/2)), (67,67,67),1)
-									except Exception as err:
-										print(str(err))
+						if(status == "bad emotion"):
+							return "bad emotion" #finish function
+						if(status == "good emotion"):
+							return "good emotion" #finish function
 
 						tic = time.time() #in this way, freezed image can show 5 seconds
 

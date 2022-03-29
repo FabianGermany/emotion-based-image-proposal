@@ -61,15 +61,10 @@ def emotion_recognizer():
 print("Starting software for emotion-based image generation...")
 inference.generate_new_GAN_img(model_path="GAN/models/existing_generator.pth", output_path="GAN/output_inference/inference.png") # generate GAN image for the next time proactively #todo
 display_default_image() #print default image
-status = emotion_recognizer() #run emotion recognition script
-
-#todo if bedingung hier reinsourcen
-
-
-if (status == "done"):
-    #propose a soothing picture via GAN
-    display_GAN_landscape_image() #show a GAN image
-
-status = emotion_recognizer()
-
+while(True):
+    status = emotion_recognizer() #run emotion recognition script
+    if (status == "bad emotion"):
+        #propose a soothing picture via GAN
+        display_GAN_landscape_image() #show a GAN image
+        #todo ich könnte hier noch good emotion über loop etc.; aber für die Studie reicht das erstmal aus..
 plt.show()
