@@ -14,7 +14,7 @@ import model_architecture
 from model_architecture import opt
 
 os.makedirs("output_training", exist_ok=True)
-load_existing_model = False #decide whether to use an existing model (True) or to create a new one (False)
+load_existing_model = True #decide whether to use an existing model (True) or to create a new one (False)
 
 
 
@@ -69,6 +69,10 @@ plt.title("Exemplary Training Images")
 plt.imshow(np.transpose(vutils.make_grid(real_batch[0].to(device)[:64], padding=2, normalize=True).cpu(),(1,2,0)))
 plt.show()
 
+plt.imshow(np.transpose(vutils.make_grid(real_batch[0].to(device)[:64], padding=2, normalize=True).cpu(),(1,2,0)))
+
+#then show them in a resolution like the output ones later
+#todo transforms.Resize(opt.img_size),
 
 #Optimizers
 #--------------------------
