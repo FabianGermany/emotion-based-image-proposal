@@ -1,3 +1,4 @@
+#Import packages
 import emotion_recognition.custom_emotion_analysis as custom_emotion_analysis
 import matplotlib.pyplot as plt
 import matplotlib.image as image
@@ -9,7 +10,6 @@ from GAN import inference
 os.makedirs("GAN/output_training", exist_ok=True)
 
 # Define settings and for image displaying
-#------------------------
 default_image = image.imread("assets/Default_Img_MB.png")
 #plt.plot(1)
 plt.ion()
@@ -18,7 +18,6 @@ plt.figure("Co-Driver Display")
 plt.axis("off")
 
 # Function to display the default image
-#------------------------
 def display_default_image():
     plt.imshow(default_image)
     plt.pause(0.001)
@@ -26,7 +25,6 @@ def display_default_image():
     #plt.show(block=False)
 
 # Function to display the GAN image
-#------------------------
 def display_GAN_landscape_image():
     plt.close('all')
     current_GAN_image = image.imread("GAN/output_inference/inference.png")
@@ -36,7 +34,6 @@ def display_GAN_landscape_image():
     # plt.show(block=False)
 
 # Emotion detection function
-#------------------------
 #The normal way is to use DeepFace.stream or DeepFace.realtime.analysis for emotion recognition
 #However, I need to access the values from DeepFace.stream, so I use my custom function stored in custom_emotion_analysis.py:
 def emotion_recognizer():
@@ -51,7 +48,6 @@ def emotion_recognizer():
                                )
 
 # Procedure
-# ------------------------
 print("Starting software for emotion-based image generation...")
 display_default_image() #print default image
 while(True):

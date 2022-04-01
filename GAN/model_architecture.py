@@ -1,9 +1,9 @@
+#Import packages
 import argparse
 import numpy as np
 import torch.nn as nn
 
 #Define (hyper-)parameters
-#--------------------------
 parser = argparse.ArgumentParser()
 parser.add_argument("--n_epochs", type=int, default=200, help="number of epochs of training") #default=200
 parser.add_argument("--batch_size", type=int, default=32, help="size of the batches") #default=128
@@ -20,7 +20,6 @@ opt = parser.parse_args()
 img_shape = (opt.channels, opt.img_size, opt.img_size)
 
 #Define generator model
-#--------------------------
 class Generator(nn.Module):
     def __init__(self):
         super(Generator, self).__init__()
@@ -44,7 +43,6 @@ class Generator(nn.Module):
         return img
 
 #Define discriminator model
-#--------------------------
 class Discriminator(nn.Module):
     def __init__(self):
         super(Discriminator, self).__init__()

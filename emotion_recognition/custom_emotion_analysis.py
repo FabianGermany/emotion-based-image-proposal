@@ -1,4 +1,6 @@
-#this code is from DeepFace and is only slightly adapted to my personal requirements
+#This code is from DeepFace and is slightly adapted to my personal requirements
+
+#Import packages
 import os
 from tqdm import tqdm
 import pandas as pd
@@ -21,10 +23,7 @@ def custom_emotion_analyzer(db_path, model_name = 'VGG-Face', detector_backend =
 	face_detector = FaceDetector.build_model(detector_backend)
 	print("Detector backend is ", detector_backend)
 
-	#------------------------
-
 	input_shape = (224, 224); input_shape_x = input_shape[0]; input_shape_y = input_shape[1]
-	text_color = (255,255,255)
 
 	employees = []
 	#check passed db folder exists
@@ -40,24 +39,16 @@ def custom_emotion_analyzer(db_path, model_name = 'VGG-Face', detector_backend =
 	if len(employees) == 0:
 		print("WARNING: There is no image in this path ( ", db_path,") . Face recognition will not be performed.")
 
-	#------------------------
-
 	if len(employees) > 0:
 
 		model = DeepFace.build_model(model_name)
 		print(model_name," is built")
 
-		#------------------------
-
 		input_shape = functions.find_input_shape(model)
 		input_shape_x = input_shape[0]; input_shape_y = input_shape[1]
 
-		#tuned thresholds for model and metric pair
-		threshold = dst.findThreshold(model_name, distance_metric)
 
-	#------------------------
 	#facial attribute analysis models
-
 	if enable_face_analysis == True:
 
 		tic = time.time()
@@ -69,13 +60,9 @@ def custom_emotion_analyzer(db_path, model_name = 'VGG-Face', detector_backend =
 
 		print("Facial attibute analysis models loaded in ",toc-tic," seconds")
 
-	#------------------------
 
 	#find embeddings for employee list
-
 	tic = time.time()
-
-	#-----------------------
 
 	pbar = tqdm(range(0, len(employees)), desc='Finding embeddings')
 
@@ -101,11 +88,7 @@ def custom_emotion_analyzer(db_path, model_name = 'VGG-Face', detector_backend =
 
 	print("Embeddings found for given data set in ", toc-tic," seconds")
 
-	#-----------------------
-
 	pivot_img_size = 112 #face recognition result image
-
-	#-----------------------
 
 	freeze = False
 	face_detected = False
@@ -155,12 +138,8 @@ def custom_emotion_analyzer(db_path, model_name = 'VGG-Face', detector_backend =
 
 				detected_face = img[int(y):int(y+h), int(x):int(x+w)] #crop detected face
 
-				#-------------------------------------
-
 				detected_faces.append((x,y,w,h))
 				face_index = face_index + 1
-
-				#-------------------------------------
 
 		if face_detected == True and face_included_frames == frame_threshold and freeze == False:
 			freeze = True
@@ -184,15 +163,11 @@ def custom_emotion_analyzer(db_path, model_name = 'VGG-Face', detector_backend =
 
 						cv2.rectangle(freeze_img, (x,y), (x+w,y+h), (67,67,67), 1) #draw rectangle to main image
 
-						#-------------------------------
-
 						#apply deep learning for custom_face
 
 						custom_face = base_img[y:y+h, x:x+w]
 
-						#-------------------------------
 						#facial attribute analysis
-
 						if enable_face_analysis == True:
 
 							gray_img = functions.preprocess_face(img = custom_face, target_size = (48, 48), grayscale = True, enforce_detection = False, detector_backend = 'opencv')
@@ -305,10 +280,6 @@ def custom_emotion_analyzer(db_path, model_name = 'VGG-Face', detector_backend =
 											, (x-pivot_img_size+70+bar_x, y + 13 + (index+1) * 20 + 5)
 											, (255,255,255), cv2.FILLED)
 
-							#-------------------------------
-
-							face_224 = functions.preprocess_face(img = custom_face, target_size = (224, 224), grayscale = False, enforce_detection = False, detector_backend = 'opencv')
-
 						if(status == "bad emotion"):
 							return "bad emotion" #finish function
 						if(status == "good emotion"):
@@ -316,7 +287,6 @@ def custom_emotion_analyzer(db_path, model_name = 'VGG-Face', detector_backend =
 
 						tic = time.time() #in this way, freezed image can show 5 seconds
 
-						#-------------------------------
 
 				time_left = int(time_threshold - (toc - tic) + 1)
 

@@ -1,5 +1,4 @@
 #Import packages
-#--------------------------
 import os
 import numpy as np
 import matplotlib.pyplot as plt
@@ -13,22 +12,18 @@ import torch
 import model_architecture
 from model_architecture import opt
 
+#Settings
 os.makedirs("output_training", exist_ok=True)
 load_existing_model = True #decide whether to use an existing model (True) or to create a new one (False)
 
-
-
 #Loss function
-#--------------------------
 adversarial_loss = torch.nn.BCELoss()
 
 #Initialize generator and discriminator
-#--------------------------
 generator = model_architecture.Generator()
 discriminator = model_architecture.Discriminator()
 
 #Hardware settings for the model training/inference
-#--------------------------
 ngpu = 0 #amount of GPUs; 0=CPU
 cuda = True if torch.cuda.is_available() else False
 if cuda:
@@ -38,9 +33,7 @@ if cuda:
 device = torch.device("cuda:0" if (torch.cuda.is_available() and ngpu > 0) else "cpu")
 Tensor = torch.cuda.FloatTensor if cuda else torch.FloatTensor
 
-
 #Load dataset
-#--------------------------
 os.makedirs("dataset/landscape_complete", exist_ok=True)
 dataset = dset.ImageFolder(root="dataset/landscape_complete",
                            transform=transforms.Compose([
@@ -50,18 +43,14 @@ dataset = dset.ImageFolder(root="dataset/landscape_complete",
                                transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5)),
                            ]))
 
-
 #Configure the data loader
-#--------------------------
 dataloader = torch.utils.data.DataLoader(
     dataset= dataset,
     batch_size=opt.batch_size,
     shuffle=True,
 )
 
-
 #Plot some exemplary training images
-#--------------------------
 real_batch = next(iter(dataloader))
 plt.figure(figsize=(6,6))
 plt.axis("off")
@@ -69,15 +58,11 @@ plt.title("Exemplary Training Images")
 plt.imshow(np.transpose(vutils.make_grid(real_batch[0].to(device)[:64], padding=2, normalize=True).cpu(),(1,2,0)))
 plt.show()
 
-
 #Optimizers
-#--------------------------
 optimizer_G = torch.optim.Adam(generator.parameters(), lr=opt.lr, betas=(opt.b1, opt.b2))
 optimizer_D = torch.optim.Adam(discriminator.parameters(), lr=opt.lr, betas=(opt.b1, opt.b2))
 
-
 #Load existing model if desired
-#--------------------------
 if(load_existing_model):
     generator.load_state_dict(torch.load("models/existing_generator.pth"))
     generator.eval()
@@ -86,9 +71,7 @@ if(load_existing_model):
     optimizer_G.load_state_dict(torch.load("models/existing_G_optimizer.pth"))
     optimizer_D.load_state_dict(torch.load("models/existing_D_optimizer.pth"))
 
-
 #Train models
-#--------------------------
 for epoch in range(opt.n_epochs): #for each epoch
     for i, (imgs, _) in enumerate(dataloader): #for each batch
 
@@ -99,36 +82,19 @@ for epoch in range(opt.n_epochs): #for each epoch
         #Configure input
         real_imgs = Variable(imgs.type(Tensor))
 
-        # -----------------
         #Train generator
-        # -----------------
-
         optimizer_G.zero_grad()
-
-
-        # Sample noise as generator input
-        z = Variable(Tensor(np.random.normal(0, 1, (imgs.shape[0], opt.latent_dim))))
-
-        #Generate a batch of images
-        gen_imgs = generator(z)
-
-        #Loss measures generator's ability to fool the discriminator
-        g_loss = adversarial_loss(discriminator(gen_imgs), valid)
-
+        z = Variable(Tensor(np.random.normal(0, 1, (imgs.shape[0], opt.latent_dim)))) # Sample noise as generator input
+        gen_imgs = generator(z) #Generate a batch of images
+        g_loss = adversarial_loss(discriminator(gen_imgs), valid) #Loss measures generator's ability to fool the discriminator
         g_loss.backward()
         optimizer_G.step()
 
-        # ---------------------
         #Train discriminator
-        #--------------------------
-
         optimizer_D.zero_grad()
-
-        # Measure discriminator's ability to classify real from generated samples
-        real_loss = adversarial_loss(discriminator(real_imgs), valid)
-        fake_loss = adversarial_loss(discriminator(gen_imgs.detach()), fake)
+        real_loss = adversarial_loss(discriminator(real_imgs), valid) # Measure discriminator's ability to classify real from generated samples
+        fake_loss = adversarial_loss(discriminator(gen_imgs.detach()), fake) # Measure discriminator's ability to classify real from generated samples
         d_loss = (real_loss + fake_loss) / 2
-
         d_loss.backward()
         optimizer_D.step()
 
@@ -136,7 +102,6 @@ for epoch in range(opt.n_epochs): #for each epoch
             "[Epoch %d/%d] [Batch %d/%d] [D loss: %f] [G loss: %f]"
             % (epoch, opt.n_epochs, i, len(dataloader), d_loss.item(), g_loss.item())
         )
-
         batches_done = epoch * len(dataloader) + i
 
         #save exemplary images regularly
