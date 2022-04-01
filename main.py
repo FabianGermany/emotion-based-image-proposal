@@ -1,24 +1,21 @@
 import emotion_recognition.custom_emotion_analysis as custom_emotion_analysis
 import matplotlib.pyplot as plt
 import matplotlib.image as image
-import time
 import os
 
 #import python files from other folders (GAN folder)
-import sys
 #sys.path.insert(0, 'GAN')
-#from GAN import inference
 from GAN import inference
 os.makedirs("GAN/output_training", exist_ok=True)
-
 
 # Define settings and for image displaying
 #------------------------
 default_image = image.imread("assets/Default_Img_MB.png")
-plt.axis("off")
 #plt.plot(1)
 plt.ion()
 plt.show()
+plt.figure("Co-Driver Display")
+plt.axis("off")
 
 # Function to display the default image
 #------------------------
@@ -31,6 +28,7 @@ def display_default_image():
 # Function to display the GAN image
 #------------------------
 def display_GAN_landscape_image():
+    plt.close('all')
     current_GAN_image = image.imread("GAN/output_inference/inference.png")
     plt.imshow(current_GAN_image)
     plt.pause(0.001)
@@ -55,9 +53,9 @@ def emotion_recognizer():
 # Procedure
 # ------------------------
 print("Starting software for emotion-based image generation...")
-inference.generate_new_GAN_img(model_path="GAN/models/existing_generator.pth", output_path="GAN/output_inference/inference.png") # generate GAN image for the next time proactively #todo
 display_default_image() #print default image
 while(True):
+    inference.generate_new_GAN_img(model_path="GAN/models/existing_generator.pth", output_path="GAN/output_inference/inference.png")  # generate GAN image for the next time proactively
     status = emotion_recognizer() #run emotion recognition script
     if (status == "bad emotion"):
         display_GAN_landscape_image() #propose a soothing picture via GAN

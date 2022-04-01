@@ -23,7 +23,13 @@ However, one of the best software on GitHub is
 [deepface](https://github.com/serengil/deepface) 
 which is based on seven emotions.
 
-**todo add image**
+
+Default Mode          |  Negative Emotion Mode
+:-------------------------:|:-------------------------:
+![](assets/software-img-readme.png)  |  ![](assets/software-img-readme.png)
+
+
+**todo add second image with GAN**
 
 
 ## How to use
@@ -39,19 +45,26 @@ which is based on seven emotions.
     1. Set ```load_existing_model = False``` for the first time. 
        For further training, the value can be set to ```True``` 
        to train an existing model.
-    1. Run **`train_GAN.py`** in the ```GAN```  folder to train the GAN on the dataset.
+    1. If necessary, adapt the parameters in the file **`model_architecture.py`** in the ```GAN``` folder.
+       There, it's possible to both adapt values concerning the model and the training.
+       Let's give an example: The dataset includes 4,319 images. 
+       If we run this software over 100 epochs and 
+       if we choose a batch-size of 32, it means that 
+       each of the 100 epochs has 4,319/32 = 134,97 (rounded 135) batches since
+       all images are fully regarded in each epoch.
+    1. Run **`train_GAN.py`** in the ```GAN``` folder to train the GAN on the dataset.
 1. Testing/Inference
     1. Make sure that the camera of the laptop is activated.
     1. Run **`main.py`** to start the emotion-based image proposal sytem. 
         This will run a script for
        the emotion recognition **`custom_emotion_analysis.py`**. If the emotion is
        not suitable (as described above), the trained GAN-model will generate
-       an image in **`inference.py`** which will replace the default UI image.
+       an image by executing the script **`inference.py`**. This will replace the default UI image.
        
 
 ## Outlook
 
-Instead of a facial emotion detction algorithm,
+Instead of a facial emotion detection algorithm,
 also other dimensions could have been used. 
 This may include:
 - Biosensors for the the breathing rate 

@@ -1,6 +1,5 @@
 #Import packages
 #--------------------------
-import argparse
 import os
 import numpy as np
 import matplotlib.pyplot as plt
@@ -15,7 +14,7 @@ import model_architecture
 from model_architecture import opt
 
 os.makedirs("output_training", exist_ok=True)
-load_existing_model = True #decide whether to use an existing model (True) or to create a new one (False)
+load_existing_model = False #decide whether to use an existing model (True) or to create a new one (False)
 
 
 
@@ -141,6 +140,7 @@ for epoch in range(opt.n_epochs): #for each epoch
         #save exemplary images regularly
         if batches_done % opt.sample_interval == 0:
             save_image(gen_imgs.data[:25], "output_training/%d.png" % batches_done, nrow=5, normalize=True)
+            # Up to 25 images will be displayed in that image. If the batch size is lower, then less images.
 
         #save models regularly
         if batches_done % opt.checkpoint_interval == 0:

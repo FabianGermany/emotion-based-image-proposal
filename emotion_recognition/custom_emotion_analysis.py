@@ -4,7 +4,6 @@ from tqdm import tqdm
 import pandas as pd
 import cv2
 import time
-import re
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 import collections #for ring buffer
 from deepface import DeepFace
