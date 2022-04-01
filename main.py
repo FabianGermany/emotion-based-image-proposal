@@ -12,8 +12,9 @@ os.makedirs("GAN/output_training", exist_ok=True)
 # Define settings and for image displaying
 default_image = image.imread("assets/Default_Img_MB.png")
 #plt.plot(1)
+#make plot in a non-blocking way: https://stackoverflow.com/questions/28269157/plotting-in-a-non-blocking-way-with-matplotlib
 plt.ion()
-plt.show()
+#plt.show()
 plt.figure("Co-Driver Display")
 plt.axis("off")
 
@@ -54,6 +55,6 @@ while(True):
     inference.generate_new_GAN_img(model_path="GAN/models/existing_generator.pth", output_path="GAN/output_inference/inference.png")  # generate GAN image for the next time proactively
     status = emotion_recognizer() #run emotion recognition script
     if (status == "bad emotion"):
+        plt.show()
+        plt.close('all')
         display_GAN_landscape_image() #propose a soothing picture via GAN
-        #todo ich könnte hier noch good emotion über loop etc.; aber für die Studie reicht das erstmal aus..
-plt.show()

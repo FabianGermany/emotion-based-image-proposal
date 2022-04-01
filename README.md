@@ -62,7 +62,38 @@ Default Mode          |  Negative Emotion Mode
        an image by executing the script **`inference.py`**. This will replace the default UI image.
        
 
-## Outlook
+
+## Features for the future
+There are some features I didn’t implement because of the scope of the project:
+- Layout of the windows for the Co-Driver-Display GUI and the Emotion Recognition
+- Research on the relative emotion values for triggering the GAN software
+- For the import of other python files/packages such as in
+  ```import GAN.model_architecture as model_architecture ```, 
+  there are cleaner approaches I guess
+- Smooth transition from default image to GAN image
+- Generation of images in the correct format of the co-driver display.
+  Currently, I generate low-res square images because it's easier and faster to train. 
+  If I want to change that (e.g. 2:1 ratio with a high resolution), 
+  I need to change the dataloader (```transforms.Resize``` etc.). 
+  But I also need to change the architecture of the models. 
+  However, 64x64 is already enough to get a first impression of 
+  how the images will look like in a high-res model.
+- The model cannot be trained after some time. 
+  There is an error saying ```RuntimeError: all elements of input should be between 0 and 1```.
+  It seems like it's about the loss functions
+  ```adversarial_loss = torch.nn.BCELoss()``` that may be replaced by
+  ```adversarial_loss = torch.nn.CrossEntropyLoss()```, but it's not clear yet why and how.
+- If the runtime error is fixed and the architecture is adapted to suitable picture formats,
+  it's recommended to run the training for e.g. 200 epochs.
+- When```main.py```, the windows mustn't be moved by the user. 
+  Otherweise the software might crash. 
+  This can be fixed by a better parallel execution of the emotion detection and 
+  the display of the images.
+
+
+
+
+## Macroscopic Outlook
 
 Instead of a facial emotion detection algorithm,
 also other dimensions could have been used. 
@@ -82,8 +113,7 @@ wants to see on the display or what the driver
 should say on the display. 
 The proposal of soothing images on the co-driver display
 is only one possible action. Other ideas could be 
-- Generation of emotion-based relaxation music 
-<!--GAN: every day different music! cf. also JukeboxAI-->
+- Generation of emotion-based relaxation music <!--GAN: every day different music! cf. also JukeboxAI-->
 - Change of the color and the brightness of the UI
 - Change of further acoustic aspects like the volume of the system
 - ...
