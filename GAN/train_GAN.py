@@ -69,15 +69,12 @@ plt.title("Exemplary Training Images")
 plt.imshow(np.transpose(vutils.make_grid(real_batch[0].to(device)[:64], padding=2, normalize=True).cpu(),(1,2,0)))
 plt.show()
 
-plt.imshow(np.transpose(vutils.make_grid(real_batch[0].to(device)[:64], padding=2, normalize=True).cpu(),(1,2,0)))
-
-#then show them in a resolution like the output ones later
-#todo transforms.Resize(opt.img_size),
 
 #Optimizers
 #--------------------------
 optimizer_G = torch.optim.Adam(generator.parameters(), lr=opt.lr, betas=(opt.b1, opt.b2))
 optimizer_D = torch.optim.Adam(discriminator.parameters(), lr=opt.lr, betas=(opt.b1, opt.b2))
+
 
 #Load existing model if desired
 #--------------------------
@@ -88,6 +85,7 @@ if(load_existing_model):
     discriminator.eval()
     optimizer_G.load_state_dict(torch.load("models/existing_G_optimizer.pth"))
     optimizer_D.load_state_dict(torch.load("models/existing_D_optimizer.pth"))
+
 
 #Train models
 #--------------------------
