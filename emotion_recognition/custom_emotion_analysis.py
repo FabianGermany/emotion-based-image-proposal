@@ -104,7 +104,9 @@ def custom_emotion_analyzer(db_path, model_name = 'VGG-Face', detector_backend =
 		if img is None:
 			break
 
-		#cv2.namedWindow('img', cv2.WINDOW_FREERATIO)
+		cv2.namedWindow('img')
+		cv2.moveWindow('img', 20, 20)
+		#cv2.resizeWindow('img', 400, 300)
 		#cv2.setWindowProperty('img', cv2.WND_PROP_FULLSCREEN, cv2.WINDOW_FULLSCREEN)
 
 		raw_img = img.copy()
@@ -215,9 +217,10 @@ def custom_emotion_analyzer(db_path, model_name = 'VGG-Face', detector_backend =
 								if(bool_many_bad_emotions):
 									print("Python Script will be started to display GAN Image...")
 									status = "bad emotion" #do return; but first display the results
-
-									#emotion_ringbuffer.extend(['emotion1', 'emotion2', 'emotion3', 'emotion4', 'emotion5']) #then reset ringbuffer
-
+								bool_many_good_emotions = all(elem == 'good_emotion' for elem in emotion_ringbuffer)  # if all values are the same and 'good_emotion'
+								if(bool_many_good_emotions):
+									print("Reset to default image...")
+									status = "good emotion" #do return; but first display the results
 
 							emotion_df = emotion_df.sort_values(by = ["score"], ascending=False).reset_index(drop=True)
 
@@ -280,11 +283,6 @@ def custom_emotion_analyzer(db_path, model_name = 'VGG-Face', detector_backend =
 											, (x-pivot_img_size+70+bar_x, y + 13 + (index+1) * 20 + 5)
 											, (255,255,255), cv2.FILLED)
 
-						if(status == "bad emotion"):
-							return "bad emotion" #finish function
-						if(status == "good emotion"):
-							return "good emotion" #finish function
-
 						tic = time.time() #in this way, freezed image can show 5 seconds
 
 
@@ -308,6 +306,9 @@ def custom_emotion_analyzer(db_path, model_name = 'VGG-Face', detector_backend =
 		if cv2.waitKey(1) & 0xFF == ord('q'): #press q to quit
 			break
 
-	#kill open cv things
-	cap.release()
-	cv2.destroyAllWindows()
+		if (status == "bad emotion"):
+			#cap.release()
+			#cv2.destroyAllWindows()
+			return status  # finish function
+		if (status == "good emotion"):
+			return status  # finish function

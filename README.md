@@ -26,7 +26,7 @@ which is based on seven emotions.
 
 Default Mode          |  Negative Emotion Mode
 :-------------------------:|:-------------------------:
-![](assets/software-img-readme.png)  |  ![](assets/software-img-readme.png)
+![](assets/good-emotion.jpg)  |  ![](assets/bad-emotion.jpg)
 
 
 **todo add second image with GAN**
@@ -89,7 +89,8 @@ There are some features I didn’t implement because of the scope of the project
   Otherweise the software might crash. 
   This can be fixed by a better parallel execution of the emotion detection and 
   the display of the images.
-
+- `The command ````moveWindow``` is adated to the screen size of my
+    laptop. It's better to define relative values.
 
 
 
