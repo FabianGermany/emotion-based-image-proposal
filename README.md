@@ -28,8 +28,7 @@ Default Mode          |  Negative Emotion Mode
 :-------------------------:|:-------------------------:
 ![](assets/good-emotion.jpg)  |  ![](assets/bad-emotion.jpg)
 
-
-**todo add second image with GAN**
+<!--![](assets/demo.gif)-->
 
 
 ## How to use
