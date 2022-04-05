@@ -12,7 +12,11 @@ from deepface import DeepFace
 from deepface.commons import functions, realtime, distance as dst
 from deepface.detectors import FaceDetector
 
-def custom_emotion_analyzer(db_path, model_name = 'VGG-Face', detector_backend = 'opencv', distance_metric = 'cosine', enable_face_analysis = True, source = 0, time_threshold = 5, frame_threshold = 5):
+def custom_emotion_analyzer(mode, db_path, model_name = 'VGG-Face', detector_backend = 'opencv', distance_metric = 'cosine', enable_face_analysis = True, source = 0, time_threshold = 5, frame_threshold = 5):
+
+	#if the mode is default, everything will be normal;
+	#if the mode is user_study, the bad emotion recognition will be triggered anyway after the counter reaches 5 iterations
+	counter = 0
 
 	status = "Init" #reset to init state
 
@@ -211,18 +215,25 @@ def custom_emotion_analyzer(db_path, model_name = 'VGG-Face', detector_backend =
 								emotion_ringbuffer.append('good_emotion')
 							print(emotion_ringbuffer)
 							print("\n")
-							if (emotion_ringbuffer.__len__() > 0):
-								# check for similarity in buffer
-								bool_many_bad_emotions = all(elem == 'bad_emotion' for elem in emotion_ringbuffer)  # if all values are the same and 'bad_emotion'
-								if(bool_many_bad_emotions):
-									print("Python Script will be started to display GAN Image...")
-									status = "bad emotion" #do return; but first display the results
-								bool_many_good_emotions = all(elem == 'good_emotion' for elem in emotion_ringbuffer)  # if all values are the same and 'good_emotion'
-								if(bool_many_good_emotions):
-									print("Reset to default image...")
-									status = "good emotion" #do return; but first display the results
+
+							if (mode == "default"):
+								if (emotion_ringbuffer.__len__() > 0):
+									# check for similarity in buffer
+									bool_many_bad_emotions = all(elem == 'bad_emotion' for elem in emotion_ringbuffer)  # if all values are the same and 'bad_emotion'
+									if(bool_many_bad_emotions):
+										print("Python Script will be started to display GAN Image...")
+										status = "bad emotion" #do return; but first display the results
+									bool_many_good_emotions = all(elem == 'good_emotion' for elem in emotion_ringbuffer)  # if all values are the same and 'good_emotion'
+									if(bool_many_good_emotions):
+										print("Reset to default image...")
+										status = "good emotion" #do return; but first display the results
+
+							counter = counter + 1  # increment counter for user study mode
+							if (mode == "user_study" and counter >= 3): #in user study mode bad emotion will be true after some iterations independent from real emotion
+								status = "bad emotion"
 
 							emotion_df = emotion_df.sort_values(by = ["score"], ascending=False).reset_index(drop=True)
+
 
 							#background of mood box
 

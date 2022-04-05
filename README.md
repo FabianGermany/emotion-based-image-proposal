@@ -53,6 +53,16 @@ Default Mode          |  Negative Emotion Mode
        all images are fully regarded in each epoch.
     1. Run **`train_GAN.py`** in the ```GAN``` folder to train the GAN on the dataset.
 1. Testing/Inference
+    1. Choose the desired reaction mode in the file **`main.py`**. The default mode is 
+       ```reaction_mode = "GAN_normal"```
+       for proposing images using GAN technique.
+       There are two other modes that are necessary for my user study: 
+       ```reaction_mode = "GAN_WoZ"``` for creating real landscape images in a
+        Wizard-of-Oz style and 
+       ```reaction_mode = "color"``` for displaying a single color.
+    1. Furthermore, please choose the operation mode.
+       ```operation_mode = "user_study"``` is for the user study while the default
+       mode is ```operation_mode = "default"```
     1. Make sure that the camera of the laptop is activated.
     1. Run **`main.py`** to start the emotion-based image proposal sytem. 
         This will run a script for
