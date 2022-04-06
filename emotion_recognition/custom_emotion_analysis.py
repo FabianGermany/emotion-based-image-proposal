@@ -109,8 +109,8 @@ def custom_emotion_analyzer(mode, db_path, model_name = 'VGG-Face', detector_bac
 			break
 
 		cv2.namedWindow('img')
-		cv2.moveWindow('img', 20, 20)
-		#cv2.resizeWindow('img', 400, 300)
+		cv2.moveWindow('img', 5, 300)
+		#cv2.resizeWindow('img', 400, 300) #this doesnt work well cause there are other elements inside with absolute size
 		#cv2.setWindowProperty('img', cv2.WND_PROP_FULLSCREEN, cv2.WINDOW_FULLSCREEN)
 
 		raw_img = img.copy()

@@ -19,6 +19,18 @@ reaction_mode = "color" #Color mode
 #operation_mode = "default"
 operation_mode = "user_study"
 
+# Function to create the co-driver display window
+def create_co_driver_display():
+    cv2.namedWindow('Co-Driver Display', cv2.WINDOW_NORMAL)
+    cv2.resizeWindow('Co-Driver Display', 700, 400)
+    cv2.moveWindow('Co-Driver Display', 700, 5)
+
+# Function to create the IC window
+def create_IC_window():
+    cv2.namedWindow('Instrument Cluster', cv2.WINDOW_NORMAL)
+    cv2.resizeWindow('Instrument Cluster', 600, 300)
+    cv2.moveWindow('Instrument Cluster', 5, 5)
+
 # Function to display the default image
 def display_default_image():
     default_image = cv2.imread("assets/Default_Img_MB.png")
@@ -39,6 +51,11 @@ def display_single_color():
     single_color_image = cv2.imread("assets/one-color.png")
     cv2.imshow('Co-Driver Display', single_color_image)
 
+# Fucntion to display the instrument cluster
+def display_IC_animation():
+    ic_image = cv2.imread("assets/ic.jpg")
+    cv2.imshow('Instrument Cluster', ic_image)
+
 # Emotion detection function
 #The normal way is to use DeepFace.stream or DeepFace.realtime.analysis for emotion recognition
 #However, I need to access the values from DeepFace.stream, so I use my custom function stored in custom_emotion_analysis.py:
@@ -57,9 +74,9 @@ def emotion_recognizer(mode):
 
 # Procedure
 print("Starting software for emotion-based image generation...")
-cv2.namedWindow('Co-Driver Display', cv2.WINDOW_NORMAL)
-cv2.resizeWindow('Co-Driver Display', 800, 500)
-cv2.moveWindow('Co-Driver Display', 700, 20)
+create_co_driver_display()
+create_IC_window()
+display_IC_animation()
 display_default_image() #print default image
 while(True):
     inference.generate_new_GAN_img(model_path="GAN/models/existing_generator.pth", output_path="GAN/output_inference/inference.png")  # generate GAN image for the next time proactively

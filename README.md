@@ -140,3 +140,5 @@ For this project, I use some libraries, third-party software or material such as
 * I also used code snippets from this 
   [PyTorch tutorial](https://pytorch.org/tutorials/beginner/dcgan_faces_tutorial.html) 
   that I recommend to read.
+* I used free images from [Pixabay](https://pixabay.com/photos/speedometer-car-vehicle-speed-2389746/) for the 
+  instrument cluster.
